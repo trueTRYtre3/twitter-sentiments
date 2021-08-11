@@ -11,14 +11,14 @@ CORS(app)
 
 # os.environ.get("headers")
 
-def predict_sentiment(word):
+def predict_sentiment(word='seahawks'):
     """
     This function retrieves and analyzes the 
     sentiments for tweets regarding a specific topic
     and returns sentimnets in a json file
     """
     sid = SentimentIntensityAnalyzer()
-    data = requests.get('https://api.twitter.com/2/tweets/search/recent?query=seattle', headers=os.environ.get('headers'))
+    data = requests.get(f'https://api.twitter.com/2/tweets/search/recent?query={word}', headers=os.environ.get('headers'))
     
     text_data = [x['text'] for x in data.json()['data']]
     cleaned_text = []
@@ -46,8 +46,10 @@ def predict_sentiment(word):
 def root():
     return 'Hello'
 
-@app.route('/tweet')
-def tweet(data):
+@app.route('/tweet', methods=['POST'])
+def tweet():
+    request_data = request.get_json()
+    data = request_data['data']
     return jsonify({
         'success': 'success',
         'data': data
