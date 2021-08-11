@@ -6,6 +6,7 @@ import './App.css';
 const App = () => {
   const [tweets, changeTweets] = useState([])
   const [search, changeSearch] = useState('')
+  const [showing, changeShowing] = useState('')
 
   useEffect(() => {
     changeTweets(fakeData)
@@ -14,6 +15,12 @@ const App = () => {
 
   const clickSearch = (e) => {
     e.preventDefault()
+    try {
+      changeShowing(search)
+      changeSearch('')
+    } catch (exception) {
+      console.log(exception)
+    }
   }
 
   return (
@@ -22,15 +29,20 @@ const App = () => {
       <p>Sample twitter sentiment for a given search</p>
       <Form onSubmit={clickSearch}>
         <Row style={{ display: 'flex', justifyContent: 'center', marginBottom: '2rem' }}>
-            <Form.Control placeholder="Ex: seahawks or #seahawks" style={{ width: '30%', marginRight: '5px' }} />
+            <Form.Control 
+              onChange={(e) => changeSearch(e.target.value)}
+              value={search}
+              placeholder="Ex: seahawks or #seahawks" 
+              style={{ width: '30%', marginRight: '5px' }} 
+            />
             <Button type="submit" variant="primary" style={{ width: '100px', marginLeft: '5px' }}>Analyze</Button>
         </Row>
       </Form>
-      {search && <h3>Results for {search}</h3>}
+      {showing && <h3>Results for {showing}</h3>}
       {tweets && 
       tweets.map((tweet, i) =>
         tweet.Text.length>0 && 
-        <Card id={i} className={tweet.compound_score} style={{ margin: '2% 18%' }}>
+        <Card key={i} className={tweet.compound_score} style={{ margin: '2% 18%' }}>
           <Card.Body>{tweet.Text}</Card.Body>
         </Card>
       )}
