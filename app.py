@@ -6,7 +6,7 @@ import re
 import pandas as pd
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='', static_folder='client/build')
 CORS(app)
 
 
@@ -45,7 +45,7 @@ def predict_sentiment(word='seahawks'):
 
 @app.route('/')
 def root():
-    return 'Hello'
+    return app.send_static_file('index.html')
 
 @app.route('/initial')
 def initial():
