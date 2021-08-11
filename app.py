@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, json
+from flask import Flask, request
 from flask_cors import CORS
 import os
 import requests
@@ -9,7 +9,6 @@ from nltk.sentiment.vader import SentimentIntensityAnalyzer
 app = Flask(__name__)
 CORS(app)
 
-# os.environ.get("headers")
 
 def predict_sentiment(word='seahawks'):
     """
@@ -18,7 +17,9 @@ def predict_sentiment(word='seahawks'):
     and returns sentimnets in a json file
     """
     sid = SentimentIntensityAnalyzer()
-    data = requests.get(f'https://api.twitter.com/2/tweets/search/recent?query={word}', headers=os.environ.get('headers'))
+
+    headers={'Authorization': f'Bearer {os.environ.get("bearer")}'}
+    data = requests.get(f'https://api.twitter.com/2/tweets/search/recent?query={word}', headers=headers)
     
     text_data = [x['text'] for x in data.json()['data']]
     cleaned_text = []
@@ -29,7 +30,7 @@ def predict_sentiment(word='seahawks'):
     text_data = pd.DataFrame(cleaned_text, columns=['Text'])
     sentiments = text_data['Text'].apply(lambda x: sid.polarity_scores(x))
     text_data['compound'] = sentiments.apply(lambda x: x['compound'])
-
+    
     def compound_score(x):
         if x >= 0.05:
             return 'POSITIVE'
@@ -38,7 +39,7 @@ def predict_sentiment(word='seahawks'):
         return 'NEUTRAL'
 
     text_data['compound_score'] = text_data['compound'].apply(compound_score)
-
+    
     return text_data.to_json(orient='records')
 
 
@@ -46,16 +47,18 @@ def predict_sentiment(word='seahawks'):
 def root():
     return 'Hello'
 
-@app.route('/tweet', methods=['POST'])
-def tweet():
+@app.route('/initial')
+def initial():
+    data = predict_sentiment()
+    return data
+
+
+@app.route('/search', methods=['POST'])
+def search():
     request_data = request.get_json()
-    data = request_data['data']
-    return jsonify({
-        'success': 'success',
-        'data': data
-    })
-
-
+    search = request_data['search']
+    data = predict_sentiment(search)
+    return data
 
 if __name__ == '__main__':
     app.run(debug=True)

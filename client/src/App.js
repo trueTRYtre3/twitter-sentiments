@@ -1,21 +1,28 @@
 import React, { useEffect, useState } from 'react'
-import fakeData from './services/fakeData';
 import {Card, Form, Button, Row }from 'react-bootstrap'
+import tweetService from './services/tweetService'
 import './App.css';
+
 
 const App = () => {
   const [tweets, changeTweets] = useState([])
   const [search, changeSearch] = useState('')
-  const [showing, changeShowing] = useState('')
+  const [showing, changeShowing] = useState('Seahawks')
 
   useEffect(() => {
-    changeTweets(fakeData)
-    
+    (async () => {
+      const data = await tweetService.getInitialData()
+      console.log('data', data)
+      changeTweets(data)
+    })()
   }, [])
 
-  const clickSearch = (e) => {
+  const clickSearch = async (e) => {
     e.preventDefault()
     try {
+      const data = await tweetService.searchTweets({ search })
+      console.log('data', data)
+      changeTweets(data)
       changeShowing(search)
       changeSearch('')
     } catch (exception) {
