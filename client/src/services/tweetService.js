@@ -7,7 +7,6 @@ const getInitialData = async () => {
 
 const searchTweets = async (search) => {
     const response = await axios.post('/search', search)
-    console.log(response)
     return response.data
 }
 

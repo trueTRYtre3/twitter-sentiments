@@ -12,7 +12,6 @@ const App = () => {
   useEffect(() => {
     (async () => {
       const data = await tweetService.getInitialData()
-      console.log('data', data)
       changeTweets(data)
     })()
   }, [])
