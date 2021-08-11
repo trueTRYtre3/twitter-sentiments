@@ -20,7 +20,6 @@ const App = () => {
     e.preventDefault()
     try {
       const data = await tweetService.searchTweets({ search })
-      console.log('data', data)
       changeTweets(data)
       changeShowing(search)
       changeSearch('')
@@ -48,7 +47,9 @@ const App = () => {
       {tweets && 
       tweets.map((tweet, i) =>
         tweet.Text.length>0 && 
-        <Card key={i} className={tweet.compound_score} style={{ margin: '2% 18%' }}>
+        <Card key={i} className={tweet.compound_score} 
+        style={{ margin: '2% 18%', boxShadow: '0px 0px 18px 1px rgba(0, 0, 0, 0.6)' }}
+        >
           <Card.Body>{tweet.Text}</Card.Body>
         </Card>
       )}
